@@ -1,0 +1,4 @@
+openweathermap:
+  # valid until 2025-06-18
+  OPENWEATHERMAP_API_KEY: 'private_sbynielsen_henrik'
+  api_user: 'T81xHEpSg0'
