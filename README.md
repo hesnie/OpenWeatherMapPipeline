@@ -1,8 +1,8 @@
-#OpenWeatherMapPipeline
-##Overview
+# OpenWeatherMapPipeline
+## Overview
 This repository contains an Apache Airflow pipeline for fetching weather data from OpenWeatherMap.
 
-##Table of Contents
+## Table of Contents
 * Overview
 * Features
 * Project Structure
@@ -12,13 +12,13 @@ This repository contains an Apache Airflow pipeline for fetching weather data fr
 * DAG Details
 * License
 
-##Features
+## Features
 - Automated data extraction from OpenWeatherMap
 - Data transformation/cleaning tasks
 - Data loading into TBD
 - Error handling and alerting
 
-##Project Structure
+## Project Structure
 Code
 ├── dags/
 │   └── weather_dag.py
@@ -31,8 +31,8 @@ Python >= 3.x
 Apache Airflow >= 2.x
 Docker (optional, for containerized deployment)
 
-##Installation
-###Clone the repository:
+## Installation
+### Clone the repository:
 
 bash
 git clone https://github.com/hesnie/OpenWeatherMapPipeline.git
@@ -61,7 +61,6 @@ Task Name	Description
 extract_weather_data	Fetches weather data from OpenWeatherMap
 transform_data	Cleans and processes raw data
 load_to_db	Loads transformed data to the destination
-(Update this table with your DAG’s actual tasks.)
 
-##License
+## License
 MIT
