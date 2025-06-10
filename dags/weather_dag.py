@@ -10,13 +10,13 @@ import base64
 import logging
 import requests
 
-# Define the basic parameters of the DAG, like schedule and start_date
+# Define the basic parameters of the DAG
 @dag(
     start_date=datetime(2024, 1, 1),
     schedule="@daily",
     catchup=False,
     doc_md=__doc__,
-    default_args={"owner": "Astro", "retries": 3},
+    default_args={"owner": "Henrik S Nielsen", "retries": 3},
     tags=["Meteomatics"],
 )
 
@@ -26,7 +26,7 @@ def weather_data():
         # Dataset outlet for the task
         outlets=["weather_data"]
     )
-    def get_weather_data(**context) -> list[dict]:
+    def get_weather_data(**context):
         """
         Get API data. 
         TODO: describe this function
@@ -60,6 +60,8 @@ def weather_data():
         except Exception as e:
             logging.error("Failed to fetch the data from Meteomatic API")
             raise 
+        
+        return response
 
 # Instantiate the DAG
 weather_data()
