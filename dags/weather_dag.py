@@ -16,7 +16,7 @@ import requests
     schedule="@daily",
     catchup=False,
     doc_md=__doc__,
-    default_args={"owner": "Henrik S Nielsen", "retries": 3},
+    default_args={"owner": "Henrik S Nielsen", "retries": 1},
     tags=["Meteomatics"],
 )
 
@@ -42,14 +42,14 @@ def weather_data():
         # Get API token 
         token_url = "https://login.meteomatics.com/api/v1/token"
         credentials = f"{API_USER}:{API_SECRET}"#.encode('utf-8')
-      
+
         response = requests.get(
             token_url,
             headers={"Authorization": f"Basic {credentials}"}) #base64.b64encode(credentials).decode()
 
         if response.status_code != 200:
             #logging.error("Failed to fetch token")
-            raise Exception("Token fetch failed")
+            raise Exception(f"Token fetch failed - Response Codee: {response.status_code} with info: {credentials}")
 
         astro_api_token = response.json().get("access_token")
 
