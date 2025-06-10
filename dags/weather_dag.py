@@ -36,7 +36,7 @@ def weather_data():
             API_USER = Variable.get('API_USER', default_var=None)
             API_SECRET = Variable.get('API_SECRET', default_var=None)
         except Exception as e:
-            logging.error("Failed to fetch params from Airflow")
+            #logging.error("Failed to fetch params from Airflow")
             raise
 
         # Get API token 
@@ -48,7 +48,7 @@ def weather_data():
             headers={"Authorization": f"Basic {credentials}"}) #base64.b64encode(credentials).decode()
 
         if response.status_code != 200:
-            logging.error("Failed to fetch token")
+            #logging.error("Failed to fetch token")
             raise Exception("Token fetch failed")
 
         astro_api_token = response.json().get("access_token")
@@ -63,7 +63,7 @@ def weather_data():
                 "https://api.meteomatics.com/2018-07-05T00%3A00%3A00Z/t_2m%3AC/postal_DE10117%2Bpostal_CH9014/json/?source=mix-radar&calibrated=true&mask=land&timeout=300&temporal_interpolation=best"
                 )
         except Exception as e:
-            logging.error("Failed to fetch the data from Meteomatic API")
+            #logging.error("Failed to fetch the data from Meteomatic API")
             raise 
         
         return response.json()
