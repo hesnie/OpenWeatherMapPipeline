@@ -5,10 +5,11 @@ TODO: describe the DAG
 from airflow.sdk.definitions.asset import Asset
 from airflow.decorators import dag, task
 from pendulum import datetime
-from airflow.models import Variable
-import base64
+from airflow.sdk import Variable
 import logging
 import requests
+import datetime as dt
+import meteomatics.api as api
 
 # Define the basic parameters of the DAG
 @dag(
@@ -40,33 +41,51 @@ def weather_data():
             raise
 
         # Get API token 
-        token_url = "https://login.meteomatics.com/api/v1/token"
-        credentials = f"{API_USER}:{API_SECRET}"#.encode('utf-8')
+        #token_url = "https://login.meteomatics.com/api/v1/token"
+        #credentials = f"{API_USER}:{API_SECRET}"#.encode('utf-8')
 
-        response = requests.get(
-            token_url,
-            headers={"Authorization": f"Basic {credentials}"}) #base64.b64encode(credentials).decode()
+        #response = requests.get(
+        #    token_url,
+        #    headers={"Authorization": f"Basic {credentials}"}) #base64.b64encode(credentials).decode()
 
-        if response.status_code != 200:
-            #logging.error("Failed to fetch token")
-            raise Exception(f"Token fetch failed - Response Codee: {response.status_code} with info: {credentials}")
+        #if response.status_code != 200:
+        #    #logging.error("Failed to fetch token")
+        #    raise Exception(f"Token fetch failed - Response Codee: {response.status_code} with info: {credentials}")
 
-        astro_api_token = response.json().get("access_token")
+        #astro_api_token = response.json().get("access_token")
 
         # Creat session using the token for requests
-        session = requests.session()
-        session.headers = {"Authorization": f"Bearer {astro_api_token}"}
+        #session = requests.session()
+        #session.headers = {"Authorization": f"Bearer {astro_api_token}"}
 
-        try:
-            response = session.get(
-                #TODO: use params, this is testing only
-                "https://api.meteomatics.com/2018-07-05T00%3A00%3A00Z/t_2m%3AC/postal_DE10117%2Bpostal_CH9014/json/?source=mix-radar&calibrated=true&mask=land&timeout=300&temporal_interpolation=best"
-                )
-        except Exception as e:
-            #logging.error("Failed to fetch the data from Meteomatic API")
-            raise 
+        coordinates = [(47.11, 11.47)]
+        parameters = ['t_2m:C', 'precip_1h:mm', 'wind_speed_10m:ms']
+        model = 'mix'
+        startdate = dt.datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+        enddate = startdate + dt.timedelta(days=1)
+        interval = dt.timedelta(hours=1)
+
+        df_weather = api.query_time_series(
+            coordinates, 
+            startdate, 
+            enddate, 
+            interval, 
+            parameters, 
+            API_USER, 
+            API_SECRET, 
+            model=model)
+
+        return df_weather
+        #try:
+        #    response = session.get(
+        #        #TODO: use params, this is testing only
+        #        "https://api.meteomatics.com/2018-07-05T00%3A00%3A00Z/t_2m%3AC/postal_DE10117%2Bpostal_CH9014/json/?source=mix-radar&calibrated=true&mask=land&timeout=300&temporal_interpolation=best"
+        #        )
+        #except Exception as e:
+        #    #logging.error("Failed to fetch the data from Meteomatic API")
+        #    raise 
         
-        return response.json()
+        #return response.json()
 
     # Call the task to add it to the DAG
     get_weather_data()
