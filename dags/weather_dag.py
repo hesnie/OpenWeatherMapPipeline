@@ -41,12 +41,17 @@ def weather_data():
 
         # Get API token 
         token_url = "https://login.meteomatics.com/api/v1/token"
-        credentials = f"{API_USER}:{API_SECRET}"
-        credentials.encode('utf-8')
-
-        astro_api_token = requests.get(
+        credentials = f"{API_USER}:{API_SECRET}"#.encode('utf-8')
+      
+        response = requests.get(
             token_url,
-            headers={"Authorization": f"Basic {credentials}"})
+            headers={"Authorization": f"Basic {credentials}"}) #base64.b64encode(credentials).decode()
+
+        if response.status_code != 200:
+            logging.error("Failed to fetch token")
+            raise Exception("Token fetch failed")
+
+        astro_api_token = response.json().get("access_token")
 
         # Creat session using the token for requests
         session = requests.session()
@@ -61,7 +66,10 @@ def weather_data():
             logging.error("Failed to fetch the data from Meteomatic API")
             raise 
         
-        return response
+        return response.json()
+
+    # Call the task to add it to the DAG
+    get_weather_data()
 
 # Instantiate the DAG
 weather_data()
