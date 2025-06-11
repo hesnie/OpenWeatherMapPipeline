@@ -17,7 +17,7 @@ import meteomatics.api as api
     schedule="@daily",
     catchup=False,
     doc_md=__doc__,
-    default_args={"owner": "Henrik S Nielsen", "retries": 1},
+    default_args={"owner": "Henrik S Nielsen", "retries": 0 }, #TODO: replace with "retries": 2},
     tags=["Meteomatics"],
 )
 
