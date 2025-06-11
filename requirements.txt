@@ -1,3 +1,4 @@
 requests
 dbt-core
 dbt-postgres
+meteomatics
