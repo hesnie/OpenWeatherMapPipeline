@@ -1,5 +1,8 @@
 name: 'openweathermap_dbt'
-version: '1.0'
-profile: 'default'
+config-version: 2
+version: '1.0.0'
+
+profile: 'openweathermap_dbt_profile'
+
 model-paths: ["models"]
 test-paths: ["tests"]

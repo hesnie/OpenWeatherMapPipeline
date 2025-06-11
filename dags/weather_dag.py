@@ -24,8 +24,8 @@ import meteomatics.api as api
 # Fetch data from the Meteomatics API
 def weather_data():
     @task(
-        # Dataset outlet for the task
-        outlets=["weather_data"]
+        # Dataset outlet for the api task
+        outlets=["weather_data_raw"]
     )
     def get_weather_data(**context):
         """
@@ -63,6 +63,28 @@ def weather_data():
 
     # Call the task to add it to the DAG
     get_weather_data()
+
+    @task(
+        # Dataset outlet for the dbt task
+        outlets=["weather_data_raw"]
+    )
+    def transform_weather_data(**context):
+        """
+        """    
+        
+        # Define paths to dbt project and virtual environment
+        PATH_TO_DBT_PROJECT =  "/home/user/dbt_projects/openweathermap_dbt"
+        PATH_TO_DBT_VENV = "/home/user/venvs/dbt_env/bin/activate"
+
+        dbt_run = BashOperator(
+            task_id="dbt_run",
+            bash_command="source $PATH_TO_DBT_VENV && dbt run --models .",
+            env={"PATH_TO_DBT_VENV": PATH_TO_DBT_VENV},
+            cwd=PATH_TO_DBT_PROJECT,
+        )
+
+    # Call the task to add it to the DAG
+    transform_weather_data
 
 # Instantiate the DAG
 weather_data()
