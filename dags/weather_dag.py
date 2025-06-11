@@ -34,8 +34,8 @@ def weather_data():
         """
         # Fetch the API key from Airflow variables
         try:
-            API_USER = Variable.get('API_USER', default_var=None)
-            API_SECRET = Variable.get('API_SECRET', default_var=None)
+            API_USER = Variable.get('API_USER')
+            API_SECRET = Variable.get('API_SECRET')
         except Exception as e:
             #logging.error("Failed to fetch params from Airflow")
             raise
