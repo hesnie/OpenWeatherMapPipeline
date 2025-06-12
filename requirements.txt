@@ -3,3 +3,6 @@ dbt-core
 dbt-postgres
 meteomatics
 pyarrow
+astronomer-cosmos==1
+apache-airflow-providers-postgres==6
+apache-airflow-providers-common-sql==1

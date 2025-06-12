@@ -1,0 +1,1 @@
+select '{{ var("test")}}' as test_value

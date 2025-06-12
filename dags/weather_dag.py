@@ -6,8 +6,7 @@ from airflow.sdk.definitions.asset import Asset
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.sdk import Variable
-import logging
-import requests
+#import logging #TODO: setup azure blob storage for dumping logs
 import datetime as dt
 import meteomatics.api as api
 
