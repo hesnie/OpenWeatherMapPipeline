@@ -2,6 +2,6 @@ requests
 dbt-sqlserver
 meteomatics
 pyarrow
-astronomer-cosmos==1.0.0
+astronomer-cosmos
 apache-airflow-providers-microsoft-azure
 apache-airflow-providers-common-sql
