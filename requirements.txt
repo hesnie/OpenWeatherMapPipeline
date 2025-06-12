@@ -3,6 +3,6 @@ dbt-core
 dbt-sqlserver
 meteomatics
 pyarrow
-astronomer-cosmos==1
+astronomer-cosmos
 apache-airflow-providers-microsoft-azure
-apache-airflow-providers-common-sql==1
+apache-airflow-providers-common-sql
