@@ -6,8 +6,7 @@ from airflow.sdk.definitions.asset import Asset
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.sdk import Variable
-import logging
-import requests
+#import logging #TODO: setup azure blob storage for dumping logs
 import datetime as dt
 import meteomatics.api as api
 
@@ -24,14 +23,22 @@ import meteomatics.api as api
 # Fetch data from the Meteomatics API
 def weather_data():
     @task(
-        # Dataset outlet for the task
-        outlets=["weather_data"]
+        # Dataset outlet for the api task
+        outlets=["weather_data_raw"]
     )
     def get_weather_data(**context):
         """
         Get API data. 
         TODO: describe this function
         """
+        # Setup vars for API call
+        coordinates = [(47.11, 11.47)]
+        parameters = ['t_2m:C', 'precip_1h:mm', 'wind_speed_10m:ms']
+        model = 'mix'
+        startdate = dt.datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+        enddate = startdate + dt.timedelta(days=1)
+        interval = dt.timedelta(hours=1)
+        
         # Fetch the API key from Airflow variables
         try:
             API_USER = Variable.get('API_USER')
@@ -40,31 +47,7 @@ def weather_data():
             #logging.error("Failed to fetch params from Airflow")
             raise
 
-        # Get API token 
-        #token_url = "https://login.meteomatics.com/api/v1/token"
-        #credentials = f"{API_USER}:{API_SECRET}"#.encode('utf-8')
-
-        #response = requests.get(
-        #    token_url,
-        #    headers={"Authorization": f"Basic {credentials}"}) #base64.b64encode(credentials).decode()
-
-        #if response.status_code != 200:
-        #    #logging.error("Failed to fetch token")
-        #    raise Exception(f"Token fetch failed - Response Codee: {response.status_code} with info: {credentials}")
-
-        #astro_api_token = response.json().get("access_token")
-
-        # Creat session using the token for requests
-        #session = requests.session()
-        #session.headers = {"Authorization": f"Bearer {astro_api_token}"}
-
-        coordinates = [(47.11, 11.47)]
-        parameters = ['t_2m:C', 'precip_1h:mm', 'wind_speed_10m:ms']
-        model = 'mix'
-        startdate = dt.datetime.utcnow().replace(minute=0, second=0, microsecond=0)
-        enddate = startdate + dt.timedelta(days=1)
-        interval = dt.timedelta(hours=1)
-
+        # Construct and call the API with the dataconnector
         df_weather = api.query_time_series(
             coordinates, 
             startdate, 
@@ -76,19 +59,46 @@ def weather_data():
             model=model)
 
         return df_weather
-        #try:
-        #    response = session.get(
-        #        #TODO: use params, this is testing only
-        #        "https://api.meteomatics.com/2018-07-05T00%3A00%3A00Z/t_2m%3AC/postal_DE10117%2Bpostal_CH9014/json/?source=mix-radar&calibrated=true&mask=land&timeout=300&temporal_interpolation=best"
-        #        )
-        #except Exception as e:
-        #    #logging.error("Failed to fetch the data from Meteomatic API")
-        #    raise 
-        
-        #return response.json()
 
     # Call the task to add it to the DAG
     get_weather_data()
+
+    @task(
+        # Dataset outlet for the dbt task
+        outlets=["weather_data_raw"]
+    )
+    def save_raw_weather_data(**context):
+        """
+        Save raw weather data to Azure blob storage
+        #TODO: add description
+        """    
+        
+        # Define paths to dbt project and virtual environment
+        PATH_TO_DBT_PROJECT =  "/home/user/dbt_projects/openweathermap_dbt"
+        PATH_TO_DBT_VENV = "/home/user/venvs/dbt_env/bin/activate"
+
+        dbt_run = BashOperator(
+            task_id="dbt_run",
+            bash_command="source $PATH_TO_DBT_VENV && dbt run --models .",
+            env={"PATH_TO_DBT_VENV": PATH_TO_DBT_VENV},
+            cwd=PATH_TO_DBT_PROJECT,
+        )
+
+    # Call the task to add it to the DAG
+    save_raw_weather_data()
+
+    @task(
+        # Dataset outlet for the dbt task
+        outlets=["weather_data_transformed"]
+    )
+    def transform_and_save_weather_data(**context):
+        """
+        Transform raw weather data to the needed data structures, and saves them in Azure SQL
+        TODO: Add description
+        """
+
+    # Call the task to add it to the DAG
+    transform_and_save_weather_data()
 
 # Instantiate the DAG
 weather_data()

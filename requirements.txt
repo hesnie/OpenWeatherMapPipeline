@@ -1,5 +1,8 @@
 requests
 dbt-core
-dbt-postgres
+dbt-sqlserver
 meteomatics
 pyarrow
+astronomer-cosmos==1
+apache-airflow-providers-microsoft-azure
+apache-airflow-providers-common-sql==1
