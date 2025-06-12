@@ -6,4 +6,3 @@ pyarrow
 astronomer-cosmos==1.1.0
 apache-airflow-providers-microsoft-azure
 apache-airflow-providers-common-sql
-apache-airflow==3.0.1+astro.1
