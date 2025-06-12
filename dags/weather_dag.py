@@ -67,8 +67,10 @@ def weather_data():
         # Dataset outlet for the dbt task
         outlets=["weather_data_raw"]
     )
-    def transform_weather_data(**context):
+    def save_raw_weather_data(**context):
         """
+        Save raw weather data to Azure blob storage
+        #TODO: add description
         """    
         
         # Define paths to dbt project and virtual environment
@@ -83,7 +85,20 @@ def weather_data():
         )
 
     # Call the task to add it to the DAG
-    transform_weather_data
+    save_raw_weather_data()
+
+    @task(
+        # Dataset outlet for the dbt task
+        outlets=["weather_data_transformed"]
+    )
+    def transform_and_save_weather_data(**context):
+        """
+        Transform raw weather data to the needed data structures, and saves them in Azure SQL
+        TODO: Add description
+        """
+
+    # Call the task to add it to the DAG
+    transform_and_save_weather_data()
 
 # Instantiate the DAG
 weather_data()
