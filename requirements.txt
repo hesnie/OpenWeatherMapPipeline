@@ -2,6 +2,5 @@ requests
 dbt-sqlserver
 meteomatics
 pyarrow
-astronomer-cosmos
 apache-airflow-providers-microsoft-azure
 apache-airflow-providers-common-sql
