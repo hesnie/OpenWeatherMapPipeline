@@ -32,11 +32,11 @@ def weather_data():
         """
         Get API data. 
         Fetches weather data from the Meteomatics API for a specific location and time range.
-        This function queries the API for temperature, precipitation, and wind speed data at a specified location
+        This function queries the API for temperature, UV index, precipitation, and wind speed data at a specified location
         """
         # Setup vars for API call
         coordinates = [(47.11, 11.47)]
-        parameters = ['t_2m:C', 'precip_1h:mm', 'wind_speed_10m:ms']
+        parameters = ['t_2m:C', 'precip_1h:mm', 'wind_speed_10m:ms', 'wind_dir_10m:d', 'uv:idx']
         model = 'mix'
         startdate = dt.datetime.now(datetime.timezone.utc).replace(minute=0, second=0, microsecond=0)
         enddate = startdate + dt.timedelta(days=1)
@@ -49,6 +49,13 @@ def weather_data():
         except Exception as e:
             #logging.error("Failed to fetch params from Airflow")
             raise
+
+        # Query the Meteomatics API for station list in Germany
+        df_stations = api.query_station_list(
+            API_USER, 
+            API_SECRET, 
+            location='germany')
+                
 
         # Construct and call the API with the dataconnector
         df_weather = api.query_time_series(
