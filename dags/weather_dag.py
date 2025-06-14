@@ -1,22 +1,24 @@
 """
-TODO: describe the DAG
+Airflow DAG to fetch weather data from the Meteomatics API, save it in Azure Blob Storage, and transform it for further use, saving it in a star schema in Azure SQL.
+This DAG is designed to run daily, fetching the latest weather data and processing it for use in analytics or reporting.
 """
 
 from airflow.sdk.definitions.asset import Asset
 from airflow.decorators import dag, task
+from airflow.sdk.operators.bash import BashOperator
 from pendulum import datetime
 from airflow.sdk import Variable
-#import logging #TODO: setup azure blob storage for dumping logs
+#import logging #TODO: setup azure blob storage for log storage
 import datetime as dt
 import meteomatics.api as api
 
 # Define the basic parameters of the DAG
 @dag(
-    start_date=datetime(2024, 1, 1),
+    start_date=dt(2024, 1, 1),
     schedule="@daily",
     catchup=False,
     doc_md=__doc__,
-    default_args={"owner": "Henrik S Nielsen", "retries": 0 }, #TODO: replace with "retries": 2},
+    default_args={"owner": "Henrik S Nielsen", "retries": 2 },
     tags=["Meteomatics"],
 )
 
@@ -29,13 +31,14 @@ def weather_data():
     def get_weather_data(**context):
         """
         Get API data. 
-        TODO: describe this function
+        Fetches weather data from the Meteomatics API for a specific location and time range.
+        This function queries the API for temperature, precipitation, and wind speed data at a specified location
         """
         # Setup vars for API call
         coordinates = [(47.11, 11.47)]
         parameters = ['t_2m:C', 'precip_1h:mm', 'wind_speed_10m:ms']
         model = 'mix'
-        startdate = dt.datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+        startdate = dt.datetime.now(datetime.timezone.utc).replace(minute=0, second=0, microsecond=0)
         enddate = startdate + dt.timedelta(days=1)
         interval = dt.timedelta(hours=1)
         
@@ -70,7 +73,8 @@ def weather_data():
     def save_raw_weather_data(**context):
         """
         Save raw weather data to Azure blob storage
-        #TODO: add description
+        This function saves the raw weather data fetched from the Meteomatics API to Azure Blob Storage.
+        The data is saved in a CSV format, which can be used for further processing or analysis.
         """    
         
         # Define paths to dbt project and virtual environment
@@ -94,7 +98,8 @@ def weather_data():
     def transform_and_save_weather_data(**context):
         """
         Transform raw weather data to the needed data structures, and saves them in Azure SQL
-        TODO: Add description
+        This function transforms the raw weather data into a star schema format suitable for analytics and reporting.
+        The transformed data is then saved in Azure SQL, making it accessible for further analysis or reporting.
         """
 
     # Call the task to add it to the DAG
