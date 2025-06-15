@@ -1,13 +1,11 @@
-#FROM astrocrpublic.azurecr.io/runtime:2.7.0
+# Dockerfile
+FROM python:3.12
 
-#RUN python -m venv dbt_venv && source dbt_venv/bin/activate && \
-#    pip install --no-cache-dir dbt-sqlserver && deactivate
+WORKDIR /usr/app
 
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM quay.io/astronomer/astro-runtime:8.8.0
+COPY . .
 
-# install dbt into a virtual environment
-RUN python -m venv dbt_venv && source dbt_venv/bin/activate && \
-    pip install --no-cache-dir dbt-sqlserver && deactivate
-
-ENV AIRFLOW__CORE__ALLOWED_DESERIALIZATION_CLASSES = airflow\.* astro\.*
+CMD ["dbt", "run"]

@@ -1,0 +1,31 @@
+# tests/generic_tests.yml
+models:
+  - name: fact_weather
+    columns:
+      - name: station_id_hash
+        tests:
+          - not_null
+      - name: weather_condition_code
+        tests:
+          - not_null'
+      - name: date
+        tests:
+          - not_null
+  - name: dim_loactions
+    columns:
+      - name: station_id_hash
+        tests:
+          - not_null
+          - unique
+  - name: dim_weather_condition
+    columns:
+      - name: weather_condition_code
+        tests:
+          - not_null
+          - unique
+  - name: dim_weather_condition
+    columns:
+      - name: weather_condition_code
+        tests:
+          - not_null
+          - unique

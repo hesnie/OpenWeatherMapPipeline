@@ -1,7 +1,0 @@
-openweathermap:
-  # valid until 2025-06-18
-  API_USER: 'private_sbynielsen_henrik'
-  API_SECRET: 'T81xHEpSg0'
-
-  azure_sql_user: hesnie
-  azure_sql_pass: 'Meteomatic123!'
