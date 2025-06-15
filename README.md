@@ -117,13 +117,8 @@ dbt test         # Run data tests
 - [dbt Documentation](https://docs.getdbt.com/)
 - [Apache Airflow](https://airflow.apache.org/)
 - [Meteomatics API](https://www.meteomatics.com/en/api/)
+- [Meteomatics Python Data Connector](https://github.com/meteomatics/python-connector-api/tree/master/examples/notebooks)
 - [Azure SQL Database](https://azure.microsoft.com/en-us/products/azure-sql/database/)
-
----
-
-## License
-
-See [LICENSE](LICENSE) for details.
 
 ---
 
