@@ -1,4 +1,11 @@
 -- models/mart/dim_locations.sql
+/*
+Create a dimension table for OpenWeatherMap locations.
+This model selects relevant fields from the staging locations data, 
+including station ID, category, type, WMO ID, alternative IDs, station name, 
+location coordinates, elevation, start and end dates, and various distance metrics.
+This dimension table can be used for analysis of weather data by location.
+*/
 select
     station_id_hash,
     station_category,
