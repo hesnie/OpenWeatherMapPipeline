@@ -6,9 +6,38 @@ profile: 'openweathermap_dbt_profile'
 
 model-paths: ["models"]
 test-paths: ["tests"]
+seed-paths: ["seeds"]
 
+seeds:
+  openweathermap_dbt:
+    +database: meteomatic
+    +schema: seed_data
+    weather_code_information:
+      +file: 'weather_code_information.csv'
+      +header: true
+      +quote: ''
+      +delimiter: ';'
+      +materialized: table
+      +tags: ['seed', 'openweathermap']
+      +description: 'Seed data for OpenWeatherMap weather codes.'
+      +columns:
+        - name: weather_code
+          quote: false
+          description: 'Weather code from OpenWeatherMap API.'
+        - name: description
+          quote: false
+          description: 'Description of the weather condition.'
+        - name: additional_information
+          quote: false
+          description: 'Additional information about the weather condition e.g. severity.'
+      +column_types:
+        weather_code: int
+        description: string
+        additional_information: string
 models:
   openweathermap_dbt:
     +materialized: table
     +database: meteomatic
     +schema: openweathermap
+    +tags: ['model', 'openweathermap']
+    +description: 'Models for OpenWeatherMap data processing.'
