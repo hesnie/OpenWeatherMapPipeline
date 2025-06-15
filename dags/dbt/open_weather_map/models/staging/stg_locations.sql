@@ -1,4 +1,9 @@
 -- models/staging/stg_locations.sql
+/*
+Create a staging model for OpenWeatherMap stations data.
+This model is used to prepare the data for further transformations and analysis.
+It selects relevant fields from the raw stations data and renames them for clarity.
+*/
 with source as (
     select * 
     from {{ source('raw_openweathermap' ,'raw_stations') }}
