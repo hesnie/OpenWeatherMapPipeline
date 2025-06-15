@@ -1,7 +1,4 @@
-requests
 dbt-sqlserver
+dbt-core
 meteomatics
-pyarrow
-astronomer-cosmos
-apache-airflow-providers-microsoft-azure
-apache-airflow-providers-common-sql
+pendulum
