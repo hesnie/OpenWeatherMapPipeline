@@ -63,7 +63,7 @@ dags/
 ### 1. Clone the Repository
 
 ```sh
-git clone https://github.com/your-org/OpenWeatherMapPipeline.git
+git clone https://github.com/hesnie/OpenWeatherMapPipeline.git
 cd OpenWeatherMapPipeline
 ```
 
