@@ -34,10 +34,18 @@ seeds:
         weather_code: int
         description: string
         additional_information: string
+
 models:
   openweathermap_dbt:
-    +materialized: table
-    +database: meteomatic
-    +schema: openweathermap
-    +tags: ['model', 'openweathermap']
-    +description: 'Models for OpenWeatherMap data processing.'
+    staging:
+      +materialized: view
+      +database: meteomatic
+      +schema: staging
+      +tags: ['staging', 'openweathermap']
+      +description: 'Staging models for OpenWeatherMap data processing.'
+    mart:
+      +materialized: table
+      +database: meteomatic
+      +schema: mart
+      +tags: ['mart', 'openweathermap']
+      +description: 'Mart models for OpenWeatherMap data processing.'

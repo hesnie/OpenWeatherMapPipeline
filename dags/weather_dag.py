@@ -3,15 +3,44 @@ Airflow DAG to fetch weather data from the Meteomatics API, save it in Azure Blo
 This DAG is designed to run daily, fetching the latest weather data and processing it for use in analytics or reporting.
 """
 
-from airflow.sdk.definitions.asset import Asset
 from airflow.decorators import dag, task
+from airflow.sdk.definitions.asset import Asset
 from airflow.sdk.operators.bash import BashOperator
-from airflow.io.path import ObjectStoragePath
-from pendulum import datetime
 from airflow.sdk import Variable
+from airflow.operators.python_operator import PythonOperator
+from airflow.io.path import ObjectStoragePath
+from sqlalchemy import create_engine
+from pendulum import datetime
 #import logging #TODO: setup azure blob storage for log storage
+import pandas as pd
 import datetime as dt
 import meteomatics.api as api
+
+def save_dataframe_to_azure_sql(df, table_name, schema='raw'):
+    """
+    Save DataFrame to Azure SQL database.
+    This function takes a DataFrame and saves it to an Azure SQL database table.
+    """
+
+    # Setup the Azure SQL connection to save the raw data in tables to further process it with dbt
+    AZURE_SQL_SERVER = Variable.get('AZURE_SQL_SERVER')
+    AZURE_SQL_DATABASE = Variable.get('AZURE_SQL_DATABASE')
+    AZURE_SQL_USERNAME = Variable.get('AZURE_SQL_USERNAME')
+    AZURE_SQL_PASSWORD = Variable.get('AZURE_SQL_PASSWORD')
+    
+    driver = 'ODBC Driver 18 for SQL Server'
+
+    # Create connection string
+    connection_string = f"mssql+pyodbc://{AZURE_SQL_USERNAME}:{AZURE_SQL_PASSWORD}@{AZURE_SQL_SERVER}/{AZURE_SQL_DATABASE}?driver={driver}"
+    engine = create_engine(connection_string)
+
+    # Save DataFrames to Azure SQL
+    df.to_sql(
+        table_name=table_name,
+        schema=schema, 
+        con=engine, 
+        if_exists='replace', 
+        index=False)
 
 # Define the basic parameters of the DAG
 @dag(
@@ -53,12 +82,15 @@ def weather_data():
             raise
 
         # Query the Meteomatics API for station list in Germany with the dataconnector
+        # Example query: https://api.meteomatics.com/find_station?location=germany
         df_stations = api.query_station_list(
             username=API_USER, 
             password=API_SECRET, 
             location='germany') # Limit to Germany for the free API
 
         # Construct and call the API with the dataconnector
+        # Example query: https://api.meteomatics.com/2025-06-14T00Z--2025-06-15T00Z:PT1H/t_2m:C,precip_1h:mm,wind_speed_10m:ms,wind_dir_10m:d,uv:idx,weather_code_1h:idx/wmo_066700/html?source=mix-obs&on_invalid=fill_with_invalid
+        # OBS: The http request will not return the station_id, but the data connector will.
         df_weather = api.query_station_timeseries(
             hash_ids=df_stations['hash_id'].tolist()[0:1],  # Limit to one station for the free API
             startdate=startdate, 
@@ -69,7 +101,7 @@ def weather_data():
             password=API_SECRET, 
             model=model)
         
-        # Setup the Azure Blob Storage path for saving the data
+        # Setup the Azure Blob Storage path for saving the raw data in parquet format
         # The path is structured to save station data and weather data in separate directories
         base = ObjectStoragePath("abfs://blob-meteomatic", conn_id="az_blob_storage")
         station_path = base / f"stations/station_data_{startdate}-{enddate}.parquet"
@@ -84,10 +116,14 @@ def weather_data():
             df_weather.to_parquet(file)
             # TODO: Should log the filetransfer to Azure Blob Storage
 
-        # Push filepaths into xcom for later tasks to use
-        # This allows subsequent tasks in the DAG to access the saved data files
-        get_weather_data.xcom_push(key="station_path", value=station_path)
-        get_weather_data.xcom_push(key="weather_path", value=weather_path)
+        PythonOperator(
+            task_id='save_station_dataframe',
+            python_callable=save_dataframe_to_azure_sql(df_stations, 'raw_stations'),
+        )
+        PythonOperator(
+            task_id='save_weather_dataframe',
+            python_callable=save_dataframe_to_azure_sql(df_weather, 'raw_weather'),
+        )
 
     # Call the task to add it to the DAG
     get_weather_data()

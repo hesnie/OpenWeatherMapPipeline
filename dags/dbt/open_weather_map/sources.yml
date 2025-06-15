@@ -1,0 +1,74 @@
+# models/sources.yml
+version: 2
+
+sources:
+  - name: raw_openweathermap
+    database: meteomatic
+    schema: raw
+    tables:
+      - name: raw_weather
+        description: 'Raw weather data from OpenWeatherMap API.'
+        columns:
+          - name: station_id 
+            description: 'Unique identifier for the weather station. Will return in the same format as the query.'
+          - name: validdate
+            description: 'Date and time of the weather data in UTC.'
+          - name: t_2m:C
+            description: 'Temperature at 2 meters above ground level in degrees Celsius.'
+          - name: precip_1h:mm
+            description: 'Precipitation in the last hour in millimeters.'
+          - name: wind_speed_10m:ms
+            description: 'Wind speed at 10 meters above ground level in meters per second.'
+          - name: wind_dir_10m:d
+            description: 'Wind direction at 10 meters above ground level in degrees.'
+          - name: uv:idx
+            description: 'UV index value.'
+          - name: weather_code_1h:idx
+            description: 'Weather condition code for the last hour.'
+      - name: raw_stations
+        description: 'Raw station data from OpenWeatherMap API.'
+        columns:
+          - name: Station Category
+            description: 'Category of the weather station.'
+          - name: Station Type
+            description: 'Type of the weather station.'
+          - name: ID Hash
+            description: 'Unique identifier for the weather station.'
+          - name: WMO ID
+            description: 'World Meteorological Organization ID for the station.'
+          - name: Alternative IDs
+            description: 'Alternative identifiers for the weather station.'
+          - name: Name
+            description: 'Name of the weather station.'
+          - name: Location Lat,Lon
+            description: 'Geographical coordinates of the weather station in latitude and longitude.'
+          - name: Elevation
+            description: 'Elevation of the weather station in meters.'
+          - name: Start Date
+          - description: 'Start date of the weather station operation.'
+          - name: End Date
+          - description: 'End date of the weather station operation.'
+          - name: Horizontal
+          - name: Distance
+          - name: Vertical Distance
+          - name: Effective Distance
+
+  - name: stg_openweathermap
+    database: meteomatic
+    schema: staging
+    tables:
+      - name: stg_locations
+        description: 'Staging model for OpenWeatherMap locations.'
+        # TODO: Add columns for stg_weather
+      - name: stg_weater_conditions
+        description: 'Staging model for OpenWeatherMap weather conditions.'
+        columns:
+          - name: weather_code
+            description: 'Weather code from OpenWeatherMap API.'
+          - name: description
+            description: 'Description of the weather condition.'
+          - name: additional_information
+            description: 'Additional information about the weather condition e.g. severity.'
+      - name: stg_weather
+        description: 'Staging model for OpenWeatherMap weather data.'
+        # TODO: Add columns for stg_weather
