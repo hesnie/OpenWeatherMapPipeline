@@ -52,18 +52,41 @@ sources:
           - name: Distance
           - name: Vertical Distance
           - name: Effective Distance
-
   - name: stg_openweathermap
     database: meteomatic
     schema: staging
     tables:
       - name: stg_locations
-        description: 'Staging model for OpenWeatherMap locations.'
-        # TODO: Add columns for stg_weather
+        description: 'Staging model for OpenWeatherMap stations.'
+        columns:
+          - name: station_id_hash
+            description: 'Unique identifier for the weather station.'
+          - name: station_category,
+            description: 'Category of the weather station.'
+          - name: station_type,
+            description: 'Type of the weather station.'
+          - name: wmo_id,
+            description: 'World Meteorological Organization ID for the station.'
+          - name: alternative_ids,
+            description: 'Alternative identifiers for the weather station.'
+          - name: station_name,
+            description: 'Name of the weather station.'
+          - name: location_lat_lon,
+            description: 'Geographical coordinates of the weather station in latitude and longitude.'
+          - name: elevation,
+            description: 'Elevation of the weather station in meters.'
+          - name: start_date,
+            description: 'Start date of the weather station operation.'
+          - name: end_date,
+            description: 'End date of the weather station operation.'
+          - name: horizontal_distance,
+          - name: distance,
+          - name: vertical_distance,
+          - name: effective_distance,
       - name: stg_weater_conditions
         description: 'Staging model for OpenWeatherMap weather conditions.'
         columns:
-          - name: weather_code
+          - name: weather_condition_code
             description: 'Weather code from OpenWeatherMap API.'
           - name: description
             description: 'Description of the weather condition.'
@@ -71,4 +94,20 @@ sources:
             description: 'Additional information about the weather condition e.g. severity.'
       - name: stg_weather
         description: 'Staging model for OpenWeatherMap weather data.'
-        # TODO: Add columns for stg_weather
+        columns:
+          - name: station_id_hash
+            description: 'Unique identifier for the weather station.'
+          - name: valid_date
+            description: 'Date and time of the weather data in UTC.'
+          - name: temperature_2m_celsius,
+            description: 'Temperature at 2 meters above ground level in degrees Celsius.'
+          - name: precipitation_1h_mm
+            description: 'Precipitation in the last hour in millimeters.'
+          - name: wind_speed_10m_ms
+            description:  'Wind speed at 10 meters above ground level in meters per second.'
+          - name: wind_direction_10m_degrees
+            description: 'Wind direction at 10 meters above ground level in degrees.'
+          - name: uv_index
+            description: 'UV index value.'
+          - name: weather_condition_code
+            description: 'Weather condition code for the last hour.'
